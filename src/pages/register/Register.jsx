@@ -11,9 +11,10 @@ function Register() {
     email: "",
     password: "",
     img: "",
-    country: "",
-    isSeller: false,
+    address: "",
+    phone: "",
     desc: "",
+    isSeller: false,
   });
 
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ function Register() {
         ...user,
         img: url,
       });
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       console.log(err);
     }
@@ -62,14 +63,24 @@ function Register() {
             onChange={handleChange}
           />
           <label htmlFor="">Password</label>
-          <input name="password" type="password" onChange={handleChange} />
-          <label htmlFor="">Profile Picture</label>
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-          <label htmlFor="">Country</label>
           <input
-            name="country"
+            name="password"
+            type="password"
+            onChange={handleChange}
+            required
+            autoComplete="current-password"
+          />
+          <label htmlFor="">Profile Picture</label>
+          <input
+            name="img"
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+          <label htmlFor="">Address</label>
+          <input
+            name="address"
             type="text"
-            placeholder="Usa"
+            placeholder="Accra"
             onChange={handleChange}
           />
           <button type="submit">Register</button>
@@ -87,7 +98,7 @@ function Register() {
           <input
             name="phone"
             type="text"
-            placeholder="+1 234 567 89"
+            placeholder="+233 234 567 89"
             onChange={handleChange}
           />
           <label htmlFor="">Description</label>
