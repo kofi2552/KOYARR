@@ -61,6 +61,7 @@ function Register() {
             type="email"
             placeholder="email"
             onChange={handleChange}
+            autoComplete="off"
           />
           <label htmlFor="">Password</label>
           <input
@@ -68,7 +69,7 @@ function Register() {
             type="password"
             onChange={handleChange}
             required
-            autoComplete="current-password"
+            autoComplete="off"
           />
           <label htmlFor="">Profile Picture</label>
           <input

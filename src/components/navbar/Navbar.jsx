@@ -24,6 +24,8 @@ function Navbar() {
 
   const navigate = useNavigate();
 
+  // console.log(currentUser._id);
+
   const handleLogout = async () => {
     try {
       await newRequest.post("/auth/logout");
@@ -56,7 +58,7 @@ function Navbar() {
                 <div className="options">
                   {currentUser.isSeller && (
                     <>
-                      <Link className="link" to="/mygigs">
+                      <Link className="link" to="/myGigs">
                         Gigs
                       </Link>
                       <Link className="link" to="/add">
@@ -78,7 +80,9 @@ function Navbar() {
             </div>
           ) : (
             <>
-              <Link to="/login" className="link">Sign in</Link>
+              <Link to="/login" className="link">
+                Sign in
+              </Link>
               <Link className="link" to="/register">
                 <button>Join</button>
               </Link>

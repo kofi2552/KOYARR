@@ -49,9 +49,7 @@ function Gigs() {
           Koyarr {">"} Graphics & Design {">"}
         </span>
         <h1>AI Artists</h1>
-        <p>
-          Explore the boundaries of art and technology with Liverr's AI artists
-        </p>
+        <p>Explore the limitless boundaries of MUSIC EDUCATION with Koyarr</p>
         <div className="menu">
           <div className="left">
             <span>Budget</span>

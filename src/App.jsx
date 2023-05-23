@@ -1,5 +1,10 @@
 import "./app.scss";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+  useScrollRestoration,
+} from "react-router-dom";
 import React from "react";
 import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/footer/Footer";
@@ -13,16 +18,20 @@ import Orders from "./pages/orders/Orders";
 import Messages from "./pages/messages/Messages";
 import Message from "./pages/message/Message";
 import MyGigs from "./pages/myGigs/MyGigs";
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Pay from "./pages/pay/Pay";
 import Success from "./pages/success/Success";
+// import getCurrentUser from "./utils/getCurrentUser";
 function App() {
   const queryClient = new QueryClient();
 
+  const scrollRestoration = useScrollRestoration();
   const Layout = () => {
+    // Restore scroll position on layout mount
+    useEffect(() => {
+      scrollRestoration.restoreScroll();
+    }, [scrollRestoration]);
+
     return (
       <div className="app">
         <QueryClientProvider client={queryClient}>
@@ -48,7 +57,7 @@ function App() {
           element: <Gigs />,
         },
         {
-          path: "/myGigs",
+          path: `/myGigs`,
           element: <MyGigs />,
         },
         {

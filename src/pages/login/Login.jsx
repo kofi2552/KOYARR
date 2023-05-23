@@ -31,6 +31,7 @@ function Login() {
           type="text"
           placeholder="johndoe"
           onChange={(e) => setUsername(e.target.value)}
+          autoComplete="current-username"
         />
 
         <label htmlFor="">Password</label>
@@ -38,6 +39,7 @@ function Login() {
           name="password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
         />
         <button type="submit">Login</button>
         {error && error}

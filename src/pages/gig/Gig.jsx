@@ -9,22 +9,28 @@ import Reviews from "../../components/reviews/Reviews";
 function Gig() {
   const { id } = useParams();
 
-  const { isLoading, error, data } = useQuery({
-    queryKey: ["gig"],
+  const {
+    isLoading,
+    error,
+    data: gigData,
+  } = useQuery({
+    queryKey: ["gig", id],
     queryFn: () =>
       newRequest.get(`/gigs/single/${id}`).then((res) => {
         return res.data;
       }),
   });
 
-  const userId = data?.userId;
+  const userId = gigData?.userId;
+
+  // console.log(userId);
 
   const {
     isLoading: isLoadingUser,
     error: errorUser,
-    data: dataUser,
+    data: userData,
   } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["user", userId],
     queryFn: () =>
       newRequest.get(`/users/${userId}`).then((res) => {
         return res.data;
@@ -44,7 +50,7 @@ function Gig() {
             <span className="breadcrumbs">
               Koyarr {">"} Graphics & Design {">"}
             </span>
-            <h1>{data.title}</h1>
+            <h1>{gigData.title}</h1>
             {isLoadingUser ? (
               "loading"
             ) : errorUser ? (
@@ -53,29 +59,30 @@ function Gig() {
               <div className="user">
                 <img
                   className="pp"
-                  src={dataUser.img || "/img/noavatar.jpg"}
+                  src={userData.img || "/img/noavatar.jpg"}
                   alt=""
                 />
-                <span>{dataUser.username}</span>
-                {!isNaN(data.totalStars / data.starNumber) && (
+                <span>{userData.username}</span>
+                {!isNaN(gigData.totalStars / gigData.starNumber) && (
                   <div className="stars">
-                    {Array(Math.round(data.totalStars / data.starNumber))
+                    {Array(Math.round(gigData.totalStars / gigData.starNumber))
                       .fill()
-                      .map((item, i) => (
+                      .map((_, i) => (
                         <img src="/img/star.png" alt="" key={i} />
                       ))}
-                    <span>{Math.round(data.totalStars / data.starNumber)}</span>
+                    <span>
+                      {Math.round(gigData.totalStars / gigData.starNumber)}
+                    </span>
                   </div>
                 )}
               </div>
             )}
             <Slider slidesToShow={1} arrowsScroll={1} className="slider">
-              {data.images.map((img) => (
-                <img key={img} src={img} alt="" />
-              ))}
+              {gigData.images &&
+                gigData.images.map((img) => <img key={img} src={img} alt="" />)}
             </Slider>
             <h2>About This Gig</h2>
-            <p>{data.desc}</p>
+            <p>{gigData.desc}</p>
             {isLoadingUser ? (
               "loading"
             ) : errorUser ? (
@@ -84,18 +91,20 @@ function Gig() {
               <div className="seller">
                 <h2>About The Seller</h2>
                 <div className="user">
-                  <img src={dataUser.img || "/img/noavatar.jpg"} alt="" />
+                  <img src={userData.img || "/img/noavatar.jpg"} alt="" />
                   <div className="info">
-                    <span>{dataUser.username}</span>
-                    {!isNaN(data.totalStars / data.starNumber) && (
+                    <span>{userData.username}</span>
+                    {!isNaN(gigData.totalStars / gigData.starNumber) && (
                       <div className="stars">
-                        {Array(Math.round(data.totalStars / data.starNumber))
+                        {Array(
+                          Math.round(gigData.totalStars / gigData.starNumber)
+                        )
                           .fill()
-                          .map((item, i) => (
+                          .map((_, i) => (
                             <img src="/img/star.png" alt="" key={i} />
                           ))}
                         <span>
-                          {Math.round(data.totalStars / data.starNumber)}
+                          {Math.round(gigData.totalStars / gigData.starNumber)}
                         </span>
                       </div>
                     )}
@@ -106,7 +115,7 @@ function Gig() {
                   <div className="items">
                     <div className="item">
                       <span className="title">From</span>
-                      <span className="desc">{dataUser.country}</span>
+                      <span className="desc">{userData.address}</span>
                     </div>
                     <div className="item">
                       <span className="title">Member since</span>
@@ -126,7 +135,7 @@ function Gig() {
                     </div>
                   </div>
                   <hr />
-                  <p>{dataUser.desc}</p>
+                  <p>{userData.desc}</p>
                 </div>
               </div>
             )}
@@ -134,28 +143,11 @@ function Gig() {
           </div>
           <div className="right">
             <div className="price">
-              <h3>{data.shortTitle}</h3>
-              <h2>$ {data.price}</h2>
+              <h3>{gigData.shortTitle}</h3>
+              <h2>$ {gigData.price}</h2>
             </div>
-            <p>{data.shortDesc}</p>
-            <div className="details">
-              <div className="item">
-                <img src="/img/clock.png" alt="" />
-                <span>{data.deliveryDate} Days Delivery</span>
-              </div>
-              <div className="item">
-                <img src="/img/recycle.png" alt="" />
-                <span>{data.revisionNumber} Revisions</span>
-              </div>
-            </div>
-            <div className="features">
-              {data.features.map((feature) => (
-                <div className="item" key={feature}>
-                  <img src="/img/greencheck.png" alt="" />
-                  <span>{feature}</span>
-                </div>
-              ))}
-            </div>
+            <p>{gigData.shortDesc}</p>
+
             <Link to={`/pay/${id}`}>
               <button>Continue</button>
             </Link>

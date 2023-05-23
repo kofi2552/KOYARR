@@ -1,17 +1,38 @@
-import React, { useReducer, useState } from "react";
+import React, { useReducer, useState, useEffect } from "react";
+import axios from "axios";
 import "./Add.scss";
 import { gigReducer, INITIAL_STATE } from "../../reducers/gigReducer";
 import upload from "../../utils/upload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import newRequest from "../../utils/newRequest";
 import { useNavigate } from "react-router-dom";
+// import getCurrentUser from "../../utils/getCurrentUser";
 
 const Add = () => {
   const [singleFile, setSingleFile] = useState(undefined);
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const [state, dispatch] = useReducer(gigReducer, INITIAL_STATE);
+
+  // const currentUser = getCurrentUser();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8800/api/categories/all"
+        );
+        setCategories(response.data);
+      } catch (error) {
+        console.log(error);
+        // Handle error
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
     dispatch({
@@ -19,16 +40,25 @@ const Add = () => {
       payload: { name: e.target.name, value: e.target.value },
     });
   };
-  const handleFeature = (e) => {
-    e.preventDefault();
+
+  const handleCategoryChange = (e) => {
     dispatch({
-      type: "ADD_FEATURE",
-      payload: e.target[0].value,
+      type: "CHANGE_INPUT",
+      payload: { name: "cat", value: e.target.value },
     });
-    e.target[0].value = "";
   };
 
-  const handleUpload = async () => {
+  // const handleFeature = (e) => {
+  //   e.preventDefault();
+  //   dispatch({
+  //     type: "ADD_FEATURE",
+  //     payload: e.target[0].value,
+  //   });
+  //   e.target[0].value = "";
+  // };
+
+  const handleUploadAndSubmit = async (e) => {
+    e.preventDefault();
     setUploading(true);
     try {
       const cover = await upload(singleFile);
@@ -36,13 +66,18 @@ const Add = () => {
       const images = await Promise.all(
         [...files].map(async (file) => {
           const url = await upload(file);
+          console.log(url);
           return url;
         })
       );
       setUploading(false);
       dispatch({ type: "ADD_IMAGES", payload: { cover, images } });
+
+      // Submit the form after successful upload
+      handleSubmit();
     } catch (err) {
       console.log(err);
+      setUploading(false);
     }
   };
 
@@ -60,9 +95,12 @@ const Add = () => {
   });
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    mutation.mutate(state);
-    navigate("/mygigs")
+    const payload = { ...state, categoryId: state.cat }; // Include categoryId in the payload
+    mutation.mutate(payload);
+    console.log(state);
+    // mutation.mutate(state);
+    // // navigate("/mygigs/");
+    // navigate(`/user/myGigs/${currentUser.id}`);
   };
 
   return (
@@ -79,11 +117,18 @@ const Add = () => {
               onChange={handleChange}
             />
             <label htmlFor="">Category</label>
-            <select name="cat" id="cat" onChange={handleChange}>
-              <option value="design">Design</option>
-              <option value="web">Web Development</option>
-              <option value="animation">Animation</option>
-              <option value="music">Music</option>
+            <select
+              name="categoryId"
+              id="cat"
+              value={state.cat}
+              onChange={handleCategoryChange}
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
             </select>
             <div className="images">
               <div className="imagesInputs">
@@ -99,9 +144,9 @@ const Add = () => {
                   onChange={(e) => setFiles(e.target.files)}
                 />
               </div>
-              <button onClick={handleUpload}>
+              {/*<button onClick={handleUpload}>
                 {uploading ? "uploading" : "Upload"}
-              </button>
+              </button>*/}
             </div>
             <label htmlFor="">Description</label>
             <textarea
@@ -112,16 +157,6 @@ const Add = () => {
               rows="16"
               onChange={handleChange}
             ></textarea>
-            <button onClick={handleSubmit}>Create</button>
-          </div>
-          <div className="details">
-            <label htmlFor="">Service Title</label>
-            <input
-              type="text"
-              name="shortTitle"
-              placeholder="e.g. One-page web design"
-              onChange={handleChange}
-            />
             <label htmlFor="">Short Description</label>
             <textarea
               name="shortDesc"
@@ -131,6 +166,23 @@ const Add = () => {
               cols="30"
               rows="10"
             ></textarea>
+            <label htmlFor="price">Price</label>
+            <input type="number" onChange={handleChange} name="price" />
+            <div className="details">
+              <label htmlFor="">Service Title</label>
+              <input
+                type="text"
+                name="shortTitle"
+                placeholder="e.g. One-page web design"
+                onChange={handleChange}
+              />
+            </div>
+            <button onClick={handleUploadAndSubmit}>
+              {uploading ? "Uploading" : "Create"}
+            </button>
+          </div>
+
+          {/*
             <label htmlFor="">Delivery Time (e.g. 3 days)</label>
             <input type="number" name="deliveryTime" onChange={handleChange} />
             <label htmlFor="">Revision Number</label>
@@ -158,9 +210,7 @@ const Add = () => {
                 </div>
               ))}
             </div>
-            <label htmlFor="">Price</label>
-            <input type="number" onChange={handleChange} name="price" />
-          </div>
+            */}
         </div>
       </div>
     </div>
